@@ -53,5 +53,5 @@ $ python3 -m http.server
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
-This project is licensed under the terms of the [MIT](https://github.com/alexfaria/lampify/blob/master/README.md)  license.
+This project is licensed under the terms of the [MIT](https://github.com/alexfaria/lampify/blob/master/LICENSE.md)  license.
 
