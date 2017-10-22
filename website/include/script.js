@@ -3,6 +3,11 @@ $(document).ready(function () {
     // $.fn.bootstrapSwitch.defaults.size = 'normal';
     // $("[name='on-off-switch']").bootstrapSwitch();
 
+	// reload the page every minute
+	setTimeout(function(){
+	   window.location.reload(1);
+	}, 60000);
+
     const location = {
         topic: "<TOPIC>",
         status: "status/#",
@@ -91,11 +96,11 @@ $(document).ready(function () {
 
     function updateStatus() {
 
-        $('#one_name').html(lamps.one_name + ' \'s lamp is ' + '<font id="one">offline</font>');
+        $('#one_name').html(lamps.one_name + '\'s lamp is ' + '<font id="one">offline</font>');
         $('#one').attr('color', lamps.one ? 'green' : 'red');
         $('#one').text(lamps.one ? 'online' : 'offline');
 
-        $('#two_name').html(lamps.two_name + ' \'s lamp is ' + '<font id="two">offline</font>');
+        $('#two_name').html(lamps.two_name + '\'s lamp is ' + '<font id="two">offline</font>');
         $('#two').attr('color', lamps.two ? 'green' : 'red');
         $('#two').text(lamps.two ? 'online' : 'offline');
 
@@ -119,16 +124,16 @@ $(document).ready(function () {
 
         } else if (topic.startsWith("status")) {
             askColour();
-            if (topic.indexOf("chloe") > -1) {
-                if (message.startsWith('1'))
-                    lamps.two = true;
-                else
-                    lamps.two = false;
-            } else if (topic.indexOf("alex") > -1) {
-                if (message.startsWith('1'))
-                    lamps.one = true;
-                else
-                    lamps.one = false;
+            if (topic.indexOf(lamps.one_name) > -1) {
+				if (message.startsWith('1'))
+					lamps.one = true;
+				else
+					lamps.one = false;
+            } else if (topic.indexOf(lamps.two_name) > -1) {
+				if (message.startsWith('1'))
+					lamps.two = true;
+				else
+					lamps.two = false;
             }
             updateStatus();
         }
