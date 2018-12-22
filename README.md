@@ -4,6 +4,8 @@ Lampify is a IoT side project I did to synchronize two coloured LED lamps over t
 the arduino source code as well as the website.
 It makes use of the [MQTT](http://mqtt.org/) protocol with the broker server installed on a Raspberry Pi 2 Model B.
 
+![gif](https://i.imgur.com/TFtsq51.gif)
+
 ## Installation
 
 ### Requirements
