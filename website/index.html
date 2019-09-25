@@ -6,17 +6,15 @@
     <title>Lampify</title>
 
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        crossorigin="anonymous">
 
     <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+        crossorigin="anonymous">
 
     <!-- Cover page style -->
     <link rel="stylesheet" href="include/styles.css">
-
-    <!-- Bootstrap Switch
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-switch@3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css">
-    -->
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -37,16 +35,33 @@
             <div class="cover-container">
                 <div class="masthead clearfix">
                     <div class="inner">
-                        <h3>Lampify Colour Picker.</h3>
+                        <h3>Lampify Colour Picker</h3>
                     </div>
                 </div>
 
                 <div class="inner cover">
                     <p class="lead">
                         <span class="glyphicon glyphicon-lamp" style="font-size: 10em;"></span>
-                        <span class="row">
-                            <input id="colorPicker" type="color" style="visibility:hidden;width:0;height:0">
-                        </span>
+
+                        <div class="modal fade" id="colourpicker" tabindex="-1" role="dialog">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" style="color:#000">Colour Wheel</h4>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <div style="margin: 0 auto;">
+                                            <canvas id="colourpickerCanvas" height="200px" width="200px"></canvas>
+                                        </div>
+                                    </div>
+
+                                </div><!-- /.modal-content -->
+                            </div><!-- /.modal-dialog -->
+                        </div><!-- /.modal -->
+
                     </p>
 
                     <div class="lead">
@@ -57,40 +72,92 @@
                             </div>
 
                             <div class="col-md-2" style="margin-top: 10px;">
-                                <a href="#" id="submit" class="btn btn-md btn-default">Submit</a>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
+                                        Mode <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#">static</a></li>
+                                        <li><a href="#">blink</a></li>
+                                        <li><a href="#">breath</a></li>
+                                        <li><a href="#">color_wipe</a></li>
+                                        <li><a href="#">color_wipe_inv</a></li>
+                                        <li><a href="#">color_wipe_rev</a></li>
+                                        <li><a href="#">color_wipe_rev_inv</a></li>
+                                        <li><a href="#">color_wipe_random</a></li>
+                                        <li><a href="#">random_color</a></li>
+                                        <li><a href="#">single_dynamic</a></li>
+                                        <li><a href="#">multi_dynamic</a></li>
+                                        <li><a href="#">rainbow</a></li>
+                                        <li><a href="#">rainbow_cycle</a></li>
+                                        <li><a href="#">scan</a></li>
+                                        <li><a href="#">dual_scan</a></li>
+                                        <li><a href="#">fade</a></li>
+                                        <li><a href="#">theater_chase</a></li>
+                                        <li><a href="#">theater_chase_rainbow</a></li>
+                                        <li><a href="#">running_lights</a></li>
+                                        <li><a href="#">twinkle</a></li>
+                                        <li><a href="#">twinkle_random</a></li>
+                                        <li><a href="#">twinkle_fade</a></li>
+                                        <li><a href="#">twinkle_fade_random</a></li>
+                                        <li><a href="#">sparkle</a></li>
+                                        <li><a href="#">flash_sparkle</a></li>
+                                        <li><a href="#">hyper_sparkle</a></li>
+                                        <li><a href="#">strobe</a></li>
+                                        <li><a href="#">strobe_rainbow</a></li>
+                                        <li><a href="#">multi_strobe</a></li>
+                                        <li><a href="#">blink_rainbow</a></li>
+                                        <li><a href="#">chase_white</a></li>
+                                        <li><a href="#">chase_color</a></li>
+                                        <li><a href="#">chase_random</a></li>
+                                        <li><a href="#">chase_rainbow</a></li>
+                                        <li><a href="#">chase_flash</a></li>
+                                        <li><a href="#">chase_flash_random</a></li>
+                                        <li><a href="#">chase_rainbow_white</a></li>
+                                        <li><a href="#">chase_blackout</a></li>
+                                        <li><a href="#">chase_blackout_rainbow</a></li>
+                                        <li><a href="#">color_sweep_random</a></li>
+                                        <li><a href="#">running_color</a></li>
+                                        <li><a href="#">running_red_blue</a></li>
+                                        <li><a href="#">running_random</a></li>
+                                        <li><a href="#">larson_scanner</a></li>
+                                        <li><a href="#">comet</a></li>
+                                        <li><a href="#">fireworks</a></li>
+                                        <li><a href="#">fireworks_random</a></li>
+                                        <li><a href="#">merry_christmas</a></li>
+                                        <li><a href="#">halloween</a></li>
+                                        <li><a href="#">fire_flicker</a></li>
+                                        <li><a href="#">fire_flicker_soft</a></li>
+                                        <li><a href="#">fire_flicker_intense</a></li>
+                                        <li><a href="#">circus_combustus</a></li>
+                                        <li><a href="#">bicolor_chase</a></li>
+                                        <li><a href="#">tricolor_chase</a></li>
+                                        <li><a href="#">icu</a></li>
+                                        <li><a href="#">custom</a></li>
+                                        <li><a href="#">custom_0</a></li>
+                                        <li><a href="#">custom_1</a></li>
+                                        <li><a href="#">custom_2</a></li>
+                                        <li><a href="#">custom_3</a></li>
+                                    </ul>
+                                </div>
                             </div>
 
                             <div class="col-md-2" style="margin-top: 10px;">
-                                <a href="#" id="random" class="btn btn-md btn-default">Random</a>
+                                <a href="#" id="random" class="btn btn-md btn-default">Random Colour</a>
                             </div>
-                            <div class="col-md-3"></div>
+                            <div class="col-md-6"></div>
 
                         </div>
                     </div>
                     <div class="lead">
                         <div class="row">
                             <div class="col-md-3"></div>
-                            <div class="col-md-6">
-                                <p id=one_name>
-                                    Lamp is
-                                    <font>offline</font>
-                                </p>
-								<p id=two_name>
-                                    Lamp is
-                                    <font>offline</font>
-                                </p>
+                            <div class="col-md-6" id="lamps">
+                                loading lamps ...
                             </div>
                             <div class="col-md-3"></div>
                         </div>
-                        <!-- <div class="row">
-                            <div class="col-md-4"></div>
-                            <div class="col-md-4">
-                              <p>
-                                <input type="checkbox" name="on-off-switch" checked>
-                              </p>
-                            </div>
-                            <div class="col-md-4"></div>
-                        </div> -->
                     </div>
                 </div>
             </div>
@@ -102,8 +169,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js" type="text/javascript"></script>
-    <!-- <script src="https://unpkg.com/bootstrap-switch@3.3.4"></script> -->
     <script src="include/script.js" type="text/javascript"></script>
-
 </body>
+
 </html>

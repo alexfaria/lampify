@@ -1,167 +1,112 @@
 $(document).ready(function () {
 
-    // $.fn.bootstrapSwitch.defaults.size = 'normal';
-    // $("[name='on-off-switch']").bootstrapSwitch();
+	const lamps = {
+		colour: '#fff',
+		url: "wss://<server>:<port>",
+	}
 
-	// reload the page every minute
-	setTimeout(function(){
-	   window.location.reload(1);
-	}, 60000);
+	let client = mqtt.connect(lamps.url);
 
-    const location = {
-        topic: "<TOPIC>",
-        status: "status/#",
-        hostname: "ws://<SERVER>",
-        port: <PORT>
-    }
-    const lamps = {
-        one: false,
-        two: false,
-        one_name: '<NAME>',
-        two_name: '<NAME>'
-    }
+	client.on('connect', function () {
+		console.log("onConnect");
+		$("#lamps").empty();
+		client.subscribe("lampify/#");
+	});
 
-    client = mqtt.connect(location.hostname + ':' + location.port);
+	client.on('error', function (error) {
+		console.log('error');
+		console.error(error);
+	});
 
-    $('#colorPicker').on("change", function () {
-        setColour($(this).val());
-    });
+	client.on('end', () => console.log('end'));
+	client.on('offline', () => console.log('offline'));
+	client.on('close', () => console.log('close'));
+	client.on('reconnect', () => console.log('reconnect'));
 
-    $('#submit').on('click', function () {
-        hex = $('#colorPicker').val();
-        console.log("#submit - " + hex)
-        sendColour(hex);
-    });
+	client.on('message', function (topic, message) {
+		console.log("DEBUG: " + topic + "\t" + message);
+		message = String(message);
 
-    $('#random').on('click', function () {
-        colour = '#' + Math.floor(Math.random() * 16777215).toString(16);
-        setColour(colour);
-        sendColour(colour);
-    });
+		if (topic == "lampify/hex") {
+			let hex = message.replace('0x', '');
+			lamps.colour = '#' + hex;
+			updatePreviewColour();
+		}
+		else if (topic.endsWith("/status")) {
+			const name = topic.slice(topic.lastIndexOf("id/") + 3, topic.lastIndexOf("/status"));
+			const lamp = document.createElement("p");
+			lamp.id = name;
 
-    $('#rainbow').on('click', function () {
-        rainbow();
-    });
+			if (message == "online") {
+				lamp.innerHTML = '<font style="color: green">' + name + '</font>';
+			} else if (message == "offline") {
+				lamp.innerHTML = '<font style="color: red">' + name + '</font>';
+			}
 
-    $('.glyphicon-lamp').on('touchstart click', function () {
-        $('#colorPicker').click();
-    });
+			$("#" + name).remove();
+			$("#lamps").append(lamp);
+		}
+	});
 
-    // called when the client connects
-    client.on('connect', function () {
-        // Once a connection has been made, make a subscription and send a message.
-        console.log("onConnect");
-        client.subscribe(location.topic);
-        client.subscribe(location.status);
-        askColour(client);
-        askStatus(client);
-    });
+	// create canvas and context objects
+	const canvas = document.getElementById('colourpickerCanvas');
+	const ctx = canvas.getContext('2d');
 
-    client.on('close', function () {
-        console.log('connection closed');
-    });
+	// drawing active image
+	const image = new Image();
+	image.onload = function () {
+		ctx.drawImage(image, 0, 0, image.width, image.height); // draw the image on the canvas
+	};
 
-    client.on('offline', function () {
-        console.log('connection offline');
-    });
+	image.src = 'include/wheel.png';
 
-    function askStatus() {
-        message = "status";
-        client.publish(location.topic, message);
-    }
+	$('#colourpickerCanvas').mousemove(function (e) { // mouse move handler
 
-    function askColour() {
-        message = "colour?";
-        client.publish(location.topic, message);
-    }
+		// get coordinates of current position
+		const canvasOffset = $(canvas).offset();
+		const canvasX = Math.floor(e.pageX - canvasOffset.left);
+		const canvasY = Math.floor(e.pageY - canvasOffset.top);
 
-    function setColour(colour) {
-        var lamp = $(".glyphicon-lamp");
-        lamp.css('color', colour);
-        $('#colorPicker').val(colour);
-    }
+		// get current pixel
+		const imageData = ctx.getImageData(canvasX, canvasY, 1, 1);
+		const pixel = imageData.data;
 
-    function sendColour(colour) {
-        message = hexToRgb(colour);
-        client.publish(location.topic, message);
-        console.log("sendColour - " + colour);
-        console.log("sendColour - Sent Message: " + message);
-    }
+		// update preview color
+		const dColor = pixel[2] + 256 * pixel[1] + 65536 * pixel[0];
+		const hexVal = '#' + ('0000' + dColor.toString(16)).substr(-6);
 
-    function rainbow() {
-        message = "rainbow";
-        client.publish(location.topic, message);
-        console.log("Sent Message: " + message);
-    }
+		lamps.colour = hexVal;
+		updatePreviewColour();
+	});
 
-    function updateStatus() {
+	$('.glyphicon-lamp').click(() => $('#colourpicker').modal('toggle'));
 
-        $('#one_name').html(lamps.one_name + '\'s lamp is ' + '<font id="one">offline</font>');
-        $('#one').attr('color', lamps.one ? 'green' : 'red');
-        $('#one').text(lamps.one ? 'online' : 'offline');
+	$('#colourpickerCanvas').click(() => {
+		$('#colourpicker').modal('toggle');
+		console.log("#submit - " + lamps.colour)
+		sendColour();
+	});
 
-        $('#two_name').html(lamps.two_name + '\'s lamp is ' + '<font id="two">offline</font>');
-        $('#two').attr('color', lamps.two ? 'green' : 'red');
-        $('#two').text(lamps.two ? 'online' : 'offline');
+	$('#random').on('click', function () {
+		lamps.colour = '#' + Math.floor(Math.random() * 16777215).toString(16);
+		updatePreviewColour();
+		sendColour();
+	});
 
-        // const two      = $('#two');
-        // const two_name = $('#two_name');
-        // two_name.text(lamps.two_name + '\'s Lamp is ');
-        // two.attr('class', lamps.two ? 'label label-success' : 'label label-danger');
-        // two.text(lamps.two ? 'online' : 'offline');
-    }
+	$('#rainbow').on('click', function () {
+		client.publish("lampify/mode", "rainbow", { qos: 1, retain: true });
+	});
 
+	$(".dropdown-menu").on("click", "li", function (event) {
+		client.publish("lampify/mode", event.target.innerHTML, { qos: 1, retain: true });
+	})
 
-    client.on('message', function (topic, message) {
-        console.log("Message arrived: " + message);
-        message = String(message);
-        if (message.startsWith("RGB")) {
-            aux = message.slice(4);
-            rgb = aux.split(',');
-            colour = "rgb(" + rgb.join(',') + ")";
-            hex = rgbToHex(colour);
-            setColour(hex);
+	function updatePreviewColour() {
+		$(".glyphicon-lamp").css('color', lamps.colour);
+		$('#colorPicker').val(lamps.colour);
+	}
 
-        } else if (topic.startsWith("status")) {
-            askColour();
-            if (topic.indexOf(lamps.one_name) > -1) {
-				if (message.startsWith('1'))
-					lamps.one = true;
-				else
-					lamps.one = false;
-            } else if (topic.indexOf(lamps.two_name) > -1) {
-				if (message.startsWith('1'))
-					lamps.two = true;
-				else
-					lamps.two = false;
-            }
-            updateStatus();
-        }
-    });
-
-    function makeid() {
-        var text = "";
-        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        for (var i = 0; i < 5; i++)
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        return text;
-    }
-
-    function hexToRgb(hex) {
-        if (/^#([a-f0-9]{3}){1,2}$/.test(hex)) {
-            if (hex.length == 4) {
-                hex = '#' + [hex[1], hex[1], hex[2], hex[2], hex[3], hex[3]].join('');
-            }
-            var c = '0x' + hex.substring(1);
-            return 'RGB ' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',');
-        }
-    }
-
-    function rgbToHex(orig) {
-        var rgb = orig.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+)/i);
-        return (rgb && rgb.length === 4) ? "#" +
-            ("0" + parseInt(rgb[1], 10).toString(16)).slice(-2) +
-            ("0" + parseInt(rgb[2], 10).toString(16)).slice(-2) +
-            ("0" + parseInt(rgb[3], 10).toString(16)).slice(-2) : orig;
-    }
+	function sendColour() {
+		client.publish("lampify/hex", lamps.colour.slice(1), { qos: 1, retain: true });
+	}
 });
