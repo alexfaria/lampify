@@ -1,112 +1,169 @@
 $(document).ready(function () {
+    //#region Bulma
 
-	const lamps = {
-		colour: '#fff',
-		url: "wss://<server>:<port>",
-	}
+    let dropdown = document.querySelector('.dropdown');
+    dropdown.addEventListener('click', function (event) {
+        event.stopPropagation();
+        dropdown.classList.toggle('is-active');
+    });
 
-	let client = mqtt.connect(lamps.url);
+    $('.lightbulb-icon').on('click', function (event) {
+        event.stopPropagation();
+        const modal = document.querySelector('.modal');  // assuming you have only 1
+        const html = document.querySelector('html');
 
-	client.on('connect', function () {
-		console.log("onConnect");
-		$("#lamps").empty();
-		client.subscribe("lampify/#");
-	});
+        modal.classList.add('is-active');
+        html.classList.add('is-clipped');
 
-	client.on('error', function (error) {
-		console.log('error');
-		console.error(error);
-	});
+        modal.querySelector('.modal-background').addEventListener('click', function (e) {
+            e.preventDefault();
+            modal.classList.remove('is-active');
+            html.classList.remove('is-clipped');
+        });
 
-	client.on('end', () => console.log('end'));
-	client.on('offline', () => console.log('offline'));
-	client.on('close', () => console.log('close'));
-	client.on('reconnect', () => console.log('reconnect'));
+        modal.querySelector('.modal-close').addEventListener('click', function (e) {
+            modal.classList.remove('is-active');
+            html.classList.remove('is-clipped');
+        });
+    });
 
-	client.on('message', function (topic, message) {
-		console.log("DEBUG: " + topic + "\t" + message);
-		message = String(message);
+    $('.dropdown-content').on('click', 'a', event => {
+        clearActiveMode();
+        event.target.classList.add('is-active');
+        publish(lamps.topics.mode, event.target.innerHTML);
+    });
 
-		if (topic == "lampify/hex") {
-			let hex = message.replace('0x', '');
-			lamps.colour = '#' + hex;
-			updatePreviewColour();
-		}
-		else if (topic.endsWith("/status")) {
-			const name = topic.slice(topic.lastIndexOf("id/") + 3, topic.lastIndexOf("/status"));
-			const lamp = document.createElement("p");
-			lamp.id = name;
+    // https://wikiki.github.io/form/slider/
 
-			if (message == "online") {
-				lamp.innerHTML = '<font style="color: green">' + name + '</font>';
-			} else if (message == "offline") {
-				lamp.innerHTML = '<font style="color: red">' + name + '</font>';
-			}
+    $('.brightness-slider').on('change', (event) => {
+        lamps.brightness = event.target.value;
+        publish(lamps.topics.brightness, lamps.brightness);
+    });
 
-			$("#" + name).remove();
-			$("#lamps").append(lamp);
-		}
-	});
+    $('.speed-slider').on('change', (event) => {
+        lamps.speed = event.target.value;
+        publish(lamps.topics.speed, lamps.speed);
+    });
 
-	// create canvas and context objects
-	const canvas = document.getElementById('colourpickerCanvas');
-	const ctx = canvas.getContext('2d');
+    //#endregion Bulma
 
-	// drawing active image
-	const image = new Image();
-	image.onload = function () {
-		ctx.drawImage(image, 0, 0, image.width, image.height); // draw the image on the canvas
-	};
+    //#region Functions
+    const clearActiveMode = () => {
+        $('.dropdown-content').find('a').each((index, element) => {
+           element.classList.remove('is-active');
+        });
+    };
 
-	image.src = 'include/wheel.png';
+    const setActiveMode = (mode) => {
+        $('.dropdown-content').find('a').each((index, element) => {
+            if (element.innerHTML === mode) {
+                element.classList.add('is-active');
+            }
+        });
+    };
 
-	$('#colourpickerCanvas').mousemove(function (e) { // mouse move handler
+    const closeModal = () => {
+        $('.modal').removeClass('is-active');
+        $('html').removeClass('is-clipped');
+    };
 
-		// get coordinates of current position
-		const canvasOffset = $(canvas).offset();
-		const canvasX = Math.floor(e.pageX - canvasOffset.left);
-		const canvasY = Math.floor(e.pageY - canvasOffset.top);
+    const publish = (topic, message) => {
+        if (client.connected) {
+            client.publish(topic, message, mqttMessageOptions);
+        }
+    };
 
-		// get current pixel
-		const imageData = ctx.getImageData(canvasX, canvasY, 1, 1);
-		const pixel = imageData.data;
+    const updateUI = () => {
+        $('.lamp').css('color', lamps.colour.hexString);
+        $('.brightness-slider').val(lamps.brightness);
+        $('.speed-slider').val(lamps.speed);
+    };
+    //#endregion Functions
 
-		// update preview color
-		const dColor = pixel[2] + 256 * pixel[1] + 65536 * pixel[0];
-		const hexVal = '#' + ('0000' + dColor.toString(16)).substr(-6);
+    //#region MQTT Setup
+    const lamps = {
+        url: 'wss://example.com/wss',
+        topic: 'lampify/#',
+        topics: {
+            hex: 'lampify/hex',
+            mode: 'lampify/mode',
+            speed: 'lampify/speed',
+            brightness: 'lampify/brightness',
+        },
+        colour: '#fff',
+        brightness: 65535,
+        speed: 255,
+        icon: {
+            user1: 'right',
+            user2: 'left',
+        },
+    };
 
-		lamps.colour = hexVal;
-		updatePreviewColour();
-	});
+    const mqttOptions = {
+        keepalive: 10,
+        protocolId: 'MQTT',
+        protocolVersion: 4,
+        clean: true,
+        reconnectPeriod: 1000,
+        connectTimeout: 30 * 1000
+    };
 
-	$('.glyphicon-lamp').click(() => $('#colourpicker').modal('toggle'));
+    const mqttMessageOptions = {
+        qos: 1,
+        retain: true
+    };
 
-	$('#colourpickerCanvas').click(() => {
-		$('#colourpicker').modal('toggle');
-		console.log("#submit - " + lamps.colour)
-		sendColour();
-	});
+    let client = mqtt.connect(lamps.url, mqttOptions);
 
-	$('#random').on('click', function () {
-		lamps.colour = '#' + Math.floor(Math.random() * 16777215).toString(16);
-		updatePreviewColour();
-		sendColour();
-	});
+    client.on('end', () => console.log('end'));
+    client.on('offline', () => console.log('offline'));
+    client.on('close', () => console.log('close'));
+    client.on('reconnect', () => console.log('reconnect'));
+    client.on('error', e => console.error(e));
+    client.on('connect', () => client.subscribe(lamps.topic));
 
-	$('#rainbow').on('click', function () {
-		client.publish("lampify/mode", "rainbow", { qos: 1, retain: true });
-	});
+    client.on('message', function (topic, message) {
+        message = String(message);
+        if (topic === lamps.topics.hex) {
+            let hex = message.replace('0x', '#');
+            lamps.colour = new iro.Color(hex);
+        } else if (topic === lamps.topics.brightness) {
+            lamps.brightness = message;
+        } else if (topic === lamps.topics.speed) {
+            lamps.speed = message;
+        } else if (topic === lamps.topics.mode) {
+            clearActiveMode();
+            setActiveMode(message);
+        } else if (topic.endsWith('/status') || topic.endsWith('/online')) {
+            const name = topic.lastIndexOf('/status') !== -1
+                ? topic.slice(topic.lastIndexOf('id/') + 'id/'.length, topic.lastIndexOf('/status'))
+                : topic.slice(topic.lastIndexOf('id/') + 'id/'.length, topic.lastIndexOf('/online'));
 
-	$(".dropdown-menu").on("click", "li", function (event) {
-		client.publish("lampify/mode", event.target.innerHTML, { qos: 1, retain: true });
-	})
+            let lamp = $(`.icon-${lamps.icon[name]}`);
 
-	function updatePreviewColour() {
-		$(".glyphicon-lamp").css('color', lamps.colour);
-		$('#colorPicker').val(lamps.colour);
-	}
+            if (message === 'online' || message === '1') {
+                lamp.addClass('has-text-warning');
+            } else if (message === 'offline' || message === '0') {
+                lamp.removeClass('has-text-warning');
+            }
+        }
+        updateUI();
+    });
+    //#endregion MQTT Setup
 
-	function sendColour() {
-		client.publish("lampify/hex", lamps.colour.slice(1), { qos: 1, retain: true });
-	}
+    //#region Colour Picker
+    // https://iro.js.org/guide.html
+    const colourPicker = new iro.ColorPicker('#picker');
+
+    colourPicker.on('input:change', (colour, changes) => {
+        lamps.colour = colour
+        updateUI();
+    });
+
+    colourPicker.on('input:end', (colour, changes) => {
+        lamps.colour = colour
+        publish(lamps.topics.hex, lamps.colour.hexString.slice(1));
+        closeModal();
+    });
+    //#endregion Colour Picker
 });
