@@ -7,7 +7,7 @@ $(document).ready(function () {
         dropdown.classList.toggle('is-active');
     });
 
-    $('.lightbulb-icon').on('click', function (event) {
+    $('.light-bulb-icon').on('click', function (event) {
         event.stopPropagation();
         const modal = document.querySelector('.modal');  // assuming you have only 1
         const html = document.querySelector('html');
@@ -50,7 +50,7 @@ $(document).ready(function () {
     //#region Functions
     const clearActiveMode = () => {
         $('.dropdown-content').find('a').each((index, element) => {
-           element.classList.remove('is-active');
+            element.classList.remove('is-active');
         });
     };
 
