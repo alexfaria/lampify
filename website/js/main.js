@@ -77,6 +77,7 @@ $(document).ready(function () {
         $('.lamp').css('color', lamps.colour.hexString);
         $('.brightness-slider').val(lamps.brightness);
         $('.speed-slider').val(lamps.speed);
+        colourPicker.color.hexString = lamps.colour.hexString;
     };
     //#endregion Functions
 
