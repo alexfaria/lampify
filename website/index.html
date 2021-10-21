@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,139 +9,30 @@
   <link href="css/fontawesome-free-5.15.4-web.all.min.css" rel="stylesheet">
   <link href="css/bulma-slider.min.css" rel="stylesheet">
   <link href="css/bulma-switch.min.css" rel="stylesheet">
-  <link href="css/style.css" rel="stylesheet">
-  <script src="js/jquery-3.6.0.slim.min.js" type="text/javascript"></script>
-  <script src="js/mqtt-4.2.8.min.js" type="text/javascript"></script>
-  <script src="js/fontawesome-free-5.15.4-web.all.min.js" type="text/javascript" defer></script>
-  <script src="js/bulma-slider.min.js" type="text/javascript" defer></script>
-  <script src="js/iro-5.2.2.min.js" type="text/javascript"></script>
-  <script src="js/main.js" type="text/javascript"></script>
+
+  <style>
+      html {
+          min-height: 100%;
+          overflow: hidden;
+      }
+  </style>
 </head>
-<body class="has-background-dark">
-<section class="section">
-  <div class="container">
-    <div class="columns is-centered">
-      <div class="column is-5 box has-background-light has-text-centered pb-6 pt-6">
-        <h1 class="title has-text-centered">
-          Lampify
-        </h1>
+<body>
+<div id="react-root"></div>
+<noscript>Your browser does not support JavaScript!</noscript>
 
-        <div class="container has-text-centered light-bulb-icon">
-          <span class="icon is-large"><i class="fas fa-lightbulb lamp"></i></span>
-        </div>
-
-        <div class="columns is-centered is-mobile is-justify-content-center">
-          <div class="column is-2">
-            <span class="icon icon-left"><i class="fas fa-lightbulb"></i></span>
-          </div>
-          <div class="column is-2">
-            <span class="icon icon-right"><i class="fas fa-lightbulb"></i></span>
-          </div>
-        </div>
-
-        <div class="level">
-          <div class="level-item">
-            <div class="dropdown has-text-left">
-              <div class="dropdown-trigger">
-                <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-                  <span>Colour Modes</span>
-                  <span class="icon is-small">
-                  <i class="fas fa-angle-down" aria-hidden="true"></i>
-                </span>
-                </button>
-              </div>
-              <div class="dropdown-menu" id="dropdown-menu" role="menu">
-                <div class="dropdown-content">
-                  <a href="#" class="dropdown-item">static</a>
-                  <a href="#" class="dropdown-item">blink</a>
-                  <a href="#" class="dropdown-item">breath</a>
-                  <a href="#" class="dropdown-item">color_wipe</a>
-                  <a href="#" class="dropdown-item">color_wipe_inv</a>
-                  <a href="#" class="dropdown-item">color_wipe_rev</a>
-                  <a href="#" class="dropdown-item">color_wipe_rev_inv</a>
-                  <a href="#" class="dropdown-item">color_wipe_random</a>
-                  <a href="#" class="dropdown-item">random_color</a>
-                  <a href="#" class="dropdown-item">single_dynamic</a>
-                  <a href="#" class="dropdown-item">multi_dynamic</a>
-                  <a href="#" class="dropdown-item">rainbow</a>
-                  <a href="#" class="dropdown-item">rainbow_cycle</a>
-                  <a href="#" class="dropdown-item">scan</a>
-                  <a href="#" class="dropdown-item">dual_scan</a>
-                  <a href="#" class="dropdown-item">fade</a>
-                  <a href="#" class="dropdown-item">theater_chase</a>
-                  <a href="#" class="dropdown-item">theater_chase_rainbow</a>
-                  <a href="#" class="dropdown-item">running_lights</a>
-                  <a href="#" class="dropdown-item">twinkle</a>
-                  <a href="#" class="dropdown-item">twinkle_random</a>
-                  <a href="#" class="dropdown-item">twinkle_fade</a>
-                  <a href="#" class="dropdown-item">twinkle_fade_random</a>
-                  <a href="#" class="dropdown-item">sparkle</a>
-                  <a href="#" class="dropdown-item">flash_sparkle</a>
-                  <a href="#" class="dropdown-item">hyper_sparkle</a>
-                  <a href="#" class="dropdown-item">strobe</a>
-                  <a href="#" class="dropdown-item">strobe_rainbow</a>
-                  <a href="#" class="dropdown-item">multi_strobe</a>
-                  <a href="#" class="dropdown-item">blink_rainbow</a>
-                  <a href="#" class="dropdown-item">chase_white</a>
-                  <a href="#" class="dropdown-item">chase_color</a>
-                  <a href="#" class="dropdown-item">chase_random</a>
-                  <a href="#" class="dropdown-item">chase_rainbow</a>
-                  <a href="#" class="dropdown-item">chase_flash</a>
-                  <a href="#" class="dropdown-item">chase_flash_random</a>
-                  <a href="#" class="dropdown-item">chase_rainbow_white</a>
-                  <a href="#" class="dropdown-item">chase_blackout</a>
-                  <a href="#" class="dropdown-item">chase_blackout_rainbow</a>
-                  <a href="#" class="dropdown-item">color_sweep_random</a>
-                  <a href="#" class="dropdown-item">running_color</a>
-                  <a href="#" class="dropdown-item">running_red_blue</a>
-                  <a href="#" class="dropdown-item">running_random</a>
-                  <a href="#" class="dropdown-item">larson_scanner</a>
-                  <a href="#" class="dropdown-item">comet</a>
-                  <a href="#" class="dropdown-item">fireworks</a>
-                  <a href="#" class="dropdown-item">fireworks_random</a>
-                  <a href="#" class="dropdown-item">merry_christmas</a>
-                  <a href="#" class="dropdown-item">halloween</a>
-                  <a href="#" class="dropdown-item">fire_flicker</a>
-                  <a href="#" class="dropdown-item">fire_flicker_soft</a>
-                  <a href="#" class="dropdown-item">fire_flicker_intense</a>
-                  <a href="#" class="dropdown-item">circus_combustus</a>
-                  <a href="#" class="dropdown-item">bicolor_chase</a>
-                  <a href="#" class="dropdown-item">tricolor_chase</a>
-                  <a href="#" class="dropdown-item">icu</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label">Brightness</label>
-          <div class="control">
-            <input class="slider brightness-slider" step="1" min="0" max="255" type="range">
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label">Speed</label>
-          <div class="control">
-            <input class="slider speed-slider" step="1000" min="0" max="65535" type="range">
-          </div>
-        </div>
-      </div>
-
-      <div class="modal">
-        <div class="modal-background"></div>
-        <div class="modal-content">
-          <div class="level">
-            <div class="level-item">
-              <div id="picker"></div>
-            </div>
-          </div>
-        </div>
-        <button class="modal-close is-large" aria-label="close"></button>
-      </div>
-    </div>
-  </div>
-</section>
+<script src="js/libs/mqtt-4.2.8.min.js" type="text/javascript"></script>
+<script src="js/libs/fontawesome-free-5.15.4-web.all.min.js" type="text/javascript"></script>
+<script src="js/libs/bulma-slider.min.js" type="text/javascript"></script>
+<script src="js/libs/iro-5.2.2.min.js" type="text/javascript"></script>
+<script src="js/libs/react.production.min-17.0.2.js" type="text/javascript"></script>
+<script src="js/libs/react-dom.production.min-17.0.2.js" type="text/javascript"></script>
+<script src="js/libs/htm.module.js" type="module"></script>
+<script src="js/components/LampIcon.js" type="module"></script>
+<script src="js/components/InputSlider.js" type="module"></script>
+<script src="js/components/DropdownMenu.js" type="module"></script>
+<script src="js/components/ColorPickerModal.js" type="module"></script>
+<script src="js/components/App.js" type="module"></script>
+<script src="js/index.js" defer type="module"></script>
 </body>
 </html>
