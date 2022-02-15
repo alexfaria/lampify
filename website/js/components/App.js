@@ -12,7 +12,8 @@ class App extends React.Component {
     constructor(props) {
         super(props);
 
-        this.lamps = {
+        this.config = {
+            lamps: ['user1', 'user2'],
             url: 'wss://example.com/wss',
             topic: 'lampify/#',
             topics: {
@@ -20,10 +21,6 @@ class App extends React.Component {
                 mode: 'lampify/mode',
                 speed: 'lampify/speed',
                 brightness: 'lampify/brightness',
-            },
-            icon: {
-                user1: 'right',
-                user2: 'left',
             },
             modes: [
                 'static',
@@ -98,8 +95,7 @@ class App extends React.Component {
             color: '#4a4a4a',
             brightness: 65535,
             speed: 255,
-            right: false,
-            left: false,
+            lamps: this.config.lamps.reduce((o, key) => ({ ...o, [key]: false}), {})
         };
 
         this.client = null;
@@ -111,7 +107,7 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-        let client = mqtt.connect(this.lamps.url, this.mqttOptions);
+        let client = mqtt.connect(this.config.url, this.mqttOptions);
         this.client = client;
 
         client.on('end', () => console.log('end'));
@@ -119,25 +115,24 @@ class App extends React.Component {
         client.on('close', () => console.log('close'));
         client.on('reconnect', () => console.log('reconnect'));
         client.on('error', e => console.error(e));
-        client.on('connect', () => this.client.subscribe(this.lamps.topic));
+        client.on('connect', () => this.client.subscribe(this.config.topic));
 
         client.on('message', (topic, message) => {
             message = String(message);
-            if (topic === this.lamps.topics.hex) {
+            if (topic === this.config.topics.hex) {
                 let hex = message.replace('0x', '#');
                 this.setState({color: hex});
-            } else if (topic === this.lamps.topics.brightness) {
+            } else if (topic === this.config.topics.brightness) {
                 this.setState({brightness: message});
-            } else if (topic === this.lamps.topics.speed) {
+            } else if (topic === this.config.topics.speed) {
                 this.setState({speed: message});
-            } else if (topic === this.lamps.topics.mode) {
+            } else if (topic === this.config.topics.mode) {
                 this.setState({mode: message});
             } else if (topic.endsWith('/status') || topic.endsWith('/online')) {
                 const name = topic.lastIndexOf('/status') !== -1
                     ? topic.slice(topic.lastIndexOf('id/') + 'id/'.length, topic.lastIndexOf('/status'))
                     : topic.slice(topic.lastIndexOf('id/') + 'id/'.length, topic.lastIndexOf('/online'));
 
-                const iconSide = this.lamps.icon[name];
                 let status = false;
 
                 if (message === 'online' || message === '1') {
@@ -146,7 +141,12 @@ class App extends React.Component {
                     status = false;
                 }
 
-                this.setState({[iconSide]: status});
+                this.setState(prevState => ({
+                    lamps: {
+                        ...prevState.lamps,
+                        [name]: status
+                    }
+                }));
             }
         });
     }
@@ -159,22 +159,22 @@ class App extends React.Component {
 
     onChangeColor(color) {
         this.setState({color: color.hexString});
-        this.publish(this.lamps.topics.hex, color.hexString.replace('#', '0x'));
+        this.publish(this.config.topics.hex, color.hexString.replace('#', '0x'));
     }
 
     onChangeMode(index) {
-        this.setState({mode: this.lamps.modes[index]});
-        this.publish(this.lamps.topics.mode, this.lamps.modes[index]);
+        this.setState({mode: this.config.modes[index]});
+        this.publish(this.config.topics.mode, this.config.modes[index]);
     }
 
     onChangeBrightness(value) {
         this.setState({brightness: value});
-        this.publish(this.lamps.topics.brightness, value.toString());
+        this.publish(this.config.topics.brightness, value.toString());
     }
 
     onChangeSpeed(value) {
         this.setState({speed: value});
-        this.publish(this.lamps.topics.speed, value.toString());
+        this.publish(this.config.topics.speed, value.toString());
     }
 
     render() {
@@ -192,13 +192,12 @@ class App extends React.Component {
                                          onChange="${this.onChangeColor}"/>
 
                     <div key="lamp-icon-container" className="columns is-centered is-mobile is-justify-content-center">
-                      <${LampIcon} key="left" on="${this.state.left}"/>
-                      <${LampIcon} key="right" on="${this.state.right}"/>
+                        ${this.config.lamps.map((key, idx) => html`<${LampIcon} key="${key}" isOn="${this.state.lamps[key]}"/>`)}
                     </div>
 
                     <div key="dropdown-menu-container" className="level">
                       <div className="level-item">
-                        <${DropdownMenu} label="Colour Modes" items="${this.lamps.modes}"
+                        <${DropdownMenu} label="Colour Modes" items="${this.config.modes}"
                                          activeItem="${this.state.mode}"
                                          onChange="${this.onChangeMode}"/>
                       </div>
