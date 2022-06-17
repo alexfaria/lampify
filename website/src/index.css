@@ -1,0 +1,19 @@
+html {
+    min-height: 100%;
+    overflow: hidden !important;
+}
+
+.svg-icon {
+    size: 1em;
+    overflow: visible;
+    width: .6875em;
+    display: inline-block;
+    font-size: inherit;
+    height: 1em;
+    vertical-align: -.125em;
+}
+
+.dropdown-menu-content {
+    overflow: auto;
+    max-height: 13em;
+}
