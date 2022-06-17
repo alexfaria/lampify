@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/lampify/static/css/main.9a3885ea.css",
+    "main.js": "/lampify/static/js/main.45135342.js",
+    "static/js/787.28cb0dcd.chunk.js": "/lampify/static/js/787.28cb0dcd.chunk.js",
+    "index.html": "/lampify/index.html",
+    "main.9a3885ea.css.map": "/lampify/static/css/main.9a3885ea.css.map",
+    "main.45135342.js.map": "/lampify/static/js/main.45135342.js.map",
+    "787.28cb0dcd.chunk.js.map": "/lampify/static/js/787.28cb0dcd.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9a3885ea.css",
+    "static/js/main.45135342.js"
+  ]
+}
