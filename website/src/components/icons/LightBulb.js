@@ -1,7 +1,7 @@
 export default function LightBulb({fill}) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg"
-             fill={fill ?? 'black'}
+             fill={fill ?? 'currentColor'}
              className="svg-icon"
              viewBox="0 0 352 512">
             <path

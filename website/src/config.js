@@ -8,8 +8,8 @@ const mqttOptions = {
 };
 
 const config = {
-    lamps: ['lamp1', 'lamp2'],
-    url: 'wss://example.com/wss',
+    lamps: ['chloe', 'alex'],
+    url: 'wss://lampify.duckdns.org/wss',
     topic: 'lampify/#',
     topics: {
         hex: 'lampify/hex',

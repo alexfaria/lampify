@@ -12,7 +12,7 @@ export default function App() {
     const [speed, setSpeed] = useState(0);
     const [brightness, setBrightness] = useState(0);
     const [mode, setMode] = useState(null);
-    const [lamps, setLamps] = useState(Object.assign(...config.lamps.map(name => ({[name]: false}))));
+    const [lampStatus, setLampStatus] = useState(Object.assign(...config.lamps.map(name => ({[name]: false}))));
 
     const client = useRef(null);
 
@@ -65,10 +65,9 @@ export default function App() {
                             status = false;
                         }
 
-                        setLamps({
-                            ...lamps,
-                            [lampName]: status
-                        });
+                        setLampStatus(prevLampStatus => ({
+                            ...prevLampStatus, [lampName]: status
+                        }));
                     }
                     break;
             }
@@ -101,52 +100,49 @@ export default function App() {
         publish(config.topics.speed, value.toString());
     }
 
-    return (
-        <div className="has-background-dark" style={{minHeight: '100vh'}}>
-            <section className="section">
-                <div className="container">
-                    <div className="columns is-centered">
-                        <div className="column is-5 box has-background-light has-text-centered pb-6 pt-6">
-                            <h1 key="title" className="title has-text-centered">
-                                Lampify
-                            </h1>
+    return <>
+        <div className="debug-screens flex bg-background-dark text-background-dark h-screen" key="background-container">
+            <div className="max-w-xs md:max-w-l xl:max-w-xl 2xl:max-w-2xl container
+                            m-auto py-12 px-4
+                            bg-background-light
+                            rounded-3xl shadow-md drop-shadow-lg overflow-hidden">
 
-                            <ColorPickerModal iconSize="10rem"
-                                              key={color}
-                                              color={color}
-                                              onChange={onChangeColor}/>
+                <h1 className="font-sans text-center font-semibold text-3xl">
+                    Lampify
+                </h1>
 
-                            <div key="lamp-icon-container"
-                                 className="columns is-centered is-mobile is-justify-content-center">
-                                {config.lamps.map((key) => <LampIcon key={key} isOn={lamps[key]}/>)}
-                            </div>
+                <ColorPickerModal color={color} setColor={setColor} onChange={onChangeColor}/>
 
-                            <div key="dropdown-menu-container" className="level">
-                                <div className="level-item">
-                                    <DropdownMenu label="Colour Modes"
-                                                  items={config.modes}
-                                                  activeItem={mode}
-                                                  onChange={onChangeMode}/>
-                                </div>
-                            </div>
-
-                            <InputSlider key="brightness-slider"
-                                         label="Brightness"
-                                         value={brightness}
-                                         step="1" min="0" max="255"
-                                         onChange={onChangeBrightness}/>
-
-                            <InputSlider key="speed-slider"
-                                         label="Speed"
-                                         value={speed}
-                                         step="1000" min="0" max="65535"
-                                         isReversed={true}
-                                         onChange={onChangeSpeed}/>
+                <div className="flex place-content-center space-x-20 my-4">
+                    {config.lamps.map(key =>
+                        <div title={key} key={'lamp-icon-' + key}>
+                            <LampIcon isOn={lampStatus[key]}/>
                         </div>
-                    </div>
+                    )}
                 </div>
-            </section>
+
+                <div className="flex place-content-center mt-8">
+                    <DropdownMenu label="Colour Modes"
+                                  items={config.modes}
+                                  activeItem={mode}
+                                  onChange={onChangeMode}/>
+                </div>
+
+                <div className="flex flex-col place-items-center mt-10 text-center space-y-10">
+                    <InputSlider label="Brightness"
+                                 value={brightness}
+                                 min="0" max="255" step="1"
+                                 onChange={onChangeBrightness}/>
+
+                    <InputSlider label="Speed"
+                                 value={speed}
+                                 min="0" max="65535" step="1000"
+                                 isReversed={true}
+                                 onChange={onChangeSpeed}/>
+                </div>
+            </div>
         </div>
-    );
+    </>;
+
 }
 

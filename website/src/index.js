@@ -1,6 +1,4 @@
 import './index.css';
-import 'bulma/css/bulma.min.css';
-import 'bulma-slider/dist/css/bulma-slider.min.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';

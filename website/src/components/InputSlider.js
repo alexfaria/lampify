@@ -1,24 +1,23 @@
 export default function InputSlider({min, max, value, label, step, onChange, isReversed = false}) {
 
-    const getValue = () => isReversed ? max - value : value
+    const getValue = (value) => isReversed ? max - value : value
 
     const _onChange = (event) => {
-        let value = event.target.value;
-        let newValue = isReversed ? max - value : value;
+        let newValue = getValue(event.target.value);
         onChange(newValue);
     };
 
     return <>
-        <div className="field">
-            <label className="label">{label}</label>
-            <div className="control">
-                <input className="slider"
-                       onChange={_onChange}
-                       value={getValue()}
-                       step={step}
+        <div className="-pt-3">
+            <span className="font-sans text-center">{label}</span>
+            <div class="mt-2">
+                <input className="custom-input-slider"
+                       type="range"
                        min={min}
                        max={max}
-                       type="range"/>
+                       step={step}
+                       onChange={_onChange}
+                       value={getValue(value)}/>
             </div>
         </div>
     </>;
