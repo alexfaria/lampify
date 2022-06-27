@@ -4,8 +4,9 @@ import {useEffect, useRef, useState} from 'react';
 import LightBulb from './icons/LightBulb';
 import Modal from './Modal';
 
-export default function ColorPickerModal({color, setColor, onChange}) {
+export default function ColorPickerModal({isLoading, color, setColor, onChange}) {
     const [open, setOpen] = useState(false);
+    const [effect, setEffect] = useState(isLoading);
 
     const colorPicker = useRef(null);
     const pickerElement = useRef(null);
@@ -28,12 +29,14 @@ export default function ColorPickerModal({color, setColor, onChange}) {
 
     useEffect(() => {
         if (colorPicker.current) {
+            setEffect(true);
             colorPicker.current.color.set(color);
         }
     }, [color]);
 
     return <>
-        <div className="container text-center text-[10rem]">
+        <div className={`container text-center text-[10rem] ${effect ? 'animate-pulse duration-1000 ease-in-out' : ''}`}
+             onAnimationIteration={() => !isLoading && setEffect(false)}>
                 <span className="icon is-large" onClick={toggleModal}>
                     <LightBulb className="lamp" fill={color}/>
                 </span>

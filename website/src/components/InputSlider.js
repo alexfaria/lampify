@@ -1,4 +1,4 @@
-export default function InputSlider({min, max, value, label, step, onChange, isReversed = false}) {
+export default function InputSlider({min, max, value, label, step, onChange, color, isReversed = false}) {
 
     const getValue = (value) => isReversed ? max - value : value
 
@@ -10,8 +10,8 @@ export default function InputSlider({min, max, value, label, step, onChange, isR
     return <>
         <div className="-pt-3">
             <span className="font-sans text-center">{label}</span>
-            <div class="mt-2">
-                <input className="custom-input-slider"
+            <div className="mt-2">
+                <input style={{accentColor: color}}
                        type="range"
                        min={min}
                        max={max}

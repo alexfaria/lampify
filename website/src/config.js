@@ -1,3 +1,5 @@
+const defaultColor = '#4a4a4a';
+
 const mqttOptions = {
     keepalive: 10,
     protocolId: 'MQTT',
@@ -77,4 +79,4 @@ const config = {
     ]
 };
 
-export {config, mqttOptions};
+export {config, mqttOptions, defaultColor};

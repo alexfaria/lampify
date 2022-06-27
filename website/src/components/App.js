@@ -5,13 +5,16 @@ import LampIcon from './LampIcon';
 import InputSlider from './InputSlider';
 import DropdownMenu from './DropdownMenu';
 import ColorPickerModal from './ColorPickerModal';
-import {config, mqttOptions} from '../config';
+import {config, mqttOptions, defaultColor} from '../config';
+
+const isDevelopmentEnv = () => !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
 export default function App() {
-    const [color, setColor] = useState('#4a4a4a');
+    const [color, setColor] = useState(defaultColor);
     const [speed, setSpeed] = useState(0);
     const [brightness, setBrightness] = useState(0);
     const [mode, setMode] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [lampStatus, setLampStatus] = useState(Object.assign(...config.lamps.map(name => ({[name]: false}))));
 
     const client = useRef(null);
@@ -21,10 +24,11 @@ export default function App() {
 
         client.current = mqtt.connect(config.url, mqttOptions);
 
-        client.current.on('end', () => console.log('end'));
-        client.current.on('offline', () => console.log('offline'));
-        client.current.on('close', () => console.log('close'));
-        client.current.on('reconnect', () => console.log('reconnect'));
+        client.current.on('offline', () => {
+            setIsLoading(true);
+            setColor(defaultColor);
+        });
+
         client.current.on('error', e => console.error(e));
         client.current.on('connect', () => client.current && client.current.subscribe(config.topic));
 
@@ -49,6 +53,7 @@ export default function App() {
                     let prependZeros = '#' + '0'.repeat(6 - hexString.length);
                     let fixHex = prependZeros + hexString;
                     setColor(fixHex);
+                    setIsLoading(false);
                     break;
 
                 default:
@@ -101,9 +106,11 @@ export default function App() {
     }
 
     return <>
-        <div className="debug-screens flex bg-background-dark text-background-dark h-screen" key="background-container">
+        <div
+            className={`${isDevelopmentEnv() ? 'debug-screens' : ''} flex bg-background-dark text-background-dark h-screen`}
+            key="background-container">
             <div className="max-w-xs md:max-w-l xl:max-w-xl 2xl:max-w-2xl container
-                            m-auto py-12 px-4
+                            m-auto mt-12 md:m-auto xl:m-auto py-12 px-4
                             bg-background-light
                             rounded-3xl shadow-md drop-shadow-lg overflow-hidden">
 
@@ -111,7 +118,7 @@ export default function App() {
                     Lampify
                 </h1>
 
-                <ColorPickerModal color={color} setColor={setColor} onChange={onChangeColor}/>
+                <ColorPickerModal isLoading={isLoading} color={color} setColor={setColor} onChange={onChangeColor}/>
 
                 <div className="flex place-content-center space-x-20 my-4">
                     {config.lamps.map(key =>
@@ -131,11 +138,13 @@ export default function App() {
                 <div className="flex flex-col place-items-center mt-10 text-center space-y-10">
                     <InputSlider label="Brightness"
                                  value={brightness}
+                                 color={color}
                                  min="0" max="255" step="1"
                                  onChange={onChangeBrightness}/>
 
                     <InputSlider label="Speed"
                                  value={speed}
+                                 color={color}
                                  min="0" max="65535" step="1000"
                                  isReversed={true}
                                  onChange={onChangeSpeed}/>
