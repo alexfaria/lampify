@@ -1,4 +1,5 @@
-import {useState} from 'react';
+import React, {useState} from 'react';
+
 import AngleDown from './icons/AngleDown';
 
 export default function DropdownMenu({label, items, onChange, activeItem}) {

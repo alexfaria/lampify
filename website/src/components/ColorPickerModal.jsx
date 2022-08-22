@@ -1,8 +1,9 @@
+import React, {useEffect, useRef, useState} from 'react';
+
 import iro from '@jaames/iro';
 
-import {useEffect, useRef, useState} from 'react';
-import LightBulb from './icons/LightBulb';
 import Modal from './Modal';
+import LightBulb from './icons/LightBulb';
 
 export default function ColorPickerModal({isLoading, color, setColor, onChange}) {
     const [open, setOpen] = useState(false);

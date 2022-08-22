@@ -1,3 +1,5 @@
+import React from 'react';
+
 import Close from './icons/Close';
 
 export default function Modal({open, toggleModal, content}) {

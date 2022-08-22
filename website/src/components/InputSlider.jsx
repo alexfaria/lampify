@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function InputSlider({min, max, value, label, step, onChange, color, isReversed = false}) {
 
     const getValue = (value) => isReversed ? max - value : value

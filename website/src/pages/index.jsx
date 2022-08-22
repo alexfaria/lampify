@@ -1,11 +1,9 @@
-import {useState, useRef, useEffect} from 'react';
-import mqtt from 'precompiled-mqtt';
+import React, {useEffect, useRef, useState} from 'react';
+import mqtt from 'mqtt';
 
-import LampIcon from './LampIcon';
-import InputSlider from './InputSlider';
-import DropdownMenu from './DropdownMenu';
-import ColorPickerModal from './ColorPickerModal';
-import {config, mqttOptions, defaultColor} from '../config';
+import {ColorPickerModal, DropdownMenu, InputSlider, LampIcon} from '../components';
+
+import {config, defaultColor, mqttOptions} from '../config';
 
 const isDevelopmentEnv = () => !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
@@ -77,7 +75,14 @@ export default function App() {
                     break;
             }
         });
-    });
+
+        return () => {
+            if (client.current) {
+                client.current.unsubscribe(config.topic)
+                client.current.end()
+            }
+        }
+    }, []);
 
     const publish = (topic, message, options) => {
         if (client.current && client.current.connected) {
